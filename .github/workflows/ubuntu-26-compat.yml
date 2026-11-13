@@ -34,10 +34,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 24
+      - name: Set up test app Node.js 16
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 16
 
       - name: Report runner and tool versions
         run: |
@@ -51,7 +51,7 @@ jobs:
           cd "${{ matrix.package_root }}"
           ${{ matrix.package_manager }} install
 
-      - name: Run the action without publishing
+      - name: Run the Node 24 action without publishing
         uses: ./
         with:
           github_token: ${{ github.token }}
