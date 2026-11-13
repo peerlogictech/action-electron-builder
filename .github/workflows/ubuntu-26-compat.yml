@@ -1,0 +1,62 @@
+name: Ubuntu 26.04 compatibility
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/ubuntu-26-compat.yml"
+      - ".github/workflows/test.yml"
+      - "action.yml"
+      - "index.js"
+      - "package.json"
+      - "yarn.lock"
+      - "test/**"
+
+permissions:
+  contents: read
+
+jobs:
+  ubuntu-26-04:
+    name: Build action test app (${{ matrix.package_manager }}, ${{ matrix.package_root }})
+    runs-on: ubuntu-26.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        package_manager: [npm, yarn]
+        package_root:
+          - "./test/app-in-root/"
+          - "./test/app-in-subdirectory/"
+          - "./test/vue-app"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up the existing Node.js 12 test runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 12
+
+      - name: Report runner and tool versions
+        run: |
+          cat /etc/os-release
+          node --version
+          npm --version
+          if command -v yarn >/dev/null 2>&1; then yarn --version; else echo "Yarn is not installed"; fi
+
+      - name: Install test app dependencies
+        run: |
+          cd "${{ matrix.package_root }}"
+          ${{ matrix.package_manager }} install
+
+      - name: Run the action without publishing
+        uses: ./
+        with:
+          github_token: ${{ github.token }}
+          package_root: ${{ matrix.package_root }}
+          use_vue_cli: ${{ contains(matrix.package_root, 'vue') }}
+          max_attempts: "2"
+          release: "false"
+          args: "--publish never"
