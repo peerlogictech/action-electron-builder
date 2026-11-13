@@ -4,6 +4,9 @@ on:
   - push
   - pull_request
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test
@@ -17,22 +20,24 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
+          node-version: 24
 
       - name: Install test app dependencies
         run: |
           cd ${{ matrix.package_root }}
           ${{ matrix.package_manager }} install
 
-      - name: Run action
+      - name: Run action without publishing
         uses: ./
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ github.token }}
           package_root: ${{ matrix.package_root }}
           use_vue_cli: ${{ contains(matrix.package_root, 'vue')}}
           max_attempts: "2"
+          release: "false"
+          args: "--publish never"
