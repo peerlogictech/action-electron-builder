@@ -49,11 +49,11 @@ inputs:
 
   # Deprecated
   app_root:
-    description: Directory where `electron-builder` commands should be run
+    description: Directory where NPM/Yarn commands should be run
     required: false
 
 runs:
-  using: node12
+  using: node24
   main: index.js
 
 branding:
