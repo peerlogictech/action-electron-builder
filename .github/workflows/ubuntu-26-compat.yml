@@ -49,7 +49,12 @@ jobs:
       - name: Install test app dependencies
         run: |
           cd "${{ matrix.package_root }}"
-          ${{ matrix.package_manager }} install
+          if [ "${{ matrix.package_manager }}" = "yarn" ] && [ "${{ matrix.package_root }}" = "./test/vue-app" ]; then
+            # This legacy fixture has conflicting Node engine ranges in transitive dependencies.
+            yarn install --ignore-engines
+          else
+            ${{ matrix.package_manager }} install
+          fi
 
       - name: Run the Node 24 action without publishing
         uses: ./
