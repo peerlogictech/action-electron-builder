@@ -46,15 +46,15 @@ jobs:
           npm --version
           if command -v yarn >/dev/null 2>&1; then yarn --version; else echo "Yarn is not installed"; fi
 
-      - name: Install test app dependencies
-        run: |
-          cd "${{ matrix.package_root }}"
-          if [ "${{ matrix.package_manager }}" = "yarn" ] && [ "${{ matrix.package_root }}" = "./test/vue-app" ]; then
-            # This legacy fixture has conflicting Node engine ranges in transitive dependencies.
-            yarn install --ignore-engines
-          else
-            ${{ matrix.package_manager }} install
-          fi
+      - name: Install dependencies for legacy Yarn Vue fixture
+        if: matrix.package_manager == 'yarn' && matrix.package_root == './test/vue-app'
+        working-directory: ${{ matrix.package_root }}
+        run: yarn install --ignore-engines
+
+      - name: Install other test app dependencies
+        if: matrix.package_manager != 'yarn' || matrix.package_root != './test/vue-app'
+        working-directory: ${{ matrix.package_root }}
+        run: ${{ matrix.package_manager }} install
 
       - name: Run the Node 24 action without publishing
         uses: ./
