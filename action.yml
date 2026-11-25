@@ -49,7 +49,7 @@ inputs:
 
   # Deprecated
   app_root:
-    description: Directory where NPM/Yarn commands should be run
+    description: Working directory for the Electron packaging command (`electron-builder` or the Vue CLI plugin)
     required: false
 
 runs:
